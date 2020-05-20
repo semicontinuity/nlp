@@ -1,3 +1,21 @@
+def isnotebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True   # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False      # Probably standard Python interpreter
+
+if isnotebook():
+  import from tqdm.notebook import tqdm
+else:
+  import tqdm
+
+
 import json
 import os
 from pathlib import Path
@@ -15,7 +33,6 @@ import torch.distributed
 import torch.backends.cudnn as cudnn
 import torch.multiprocessing as mp
 from torch import nn, optim
-import tqdm
 import sentencepiece as spm
 
 from .fire_utils import only_allow_defined_args, get_defined_args
@@ -225,14 +242,11 @@ def main(
             train_step()
             seen_tokens += step_tokens
             step += 1
-            if step % epoch_pbar_refresh_every == 0:
-                print(f'Step: {step} // {epoch_pbar_refresh_every}, updating bar')
-                epoch_pbar.update(step_tokens)
-                epoch_pbar.set_description(f'epoch {1 + seen_tokens // epoch_size}')
-                epoch_pbar.set_postfix(loss=f'{loss_meter.mean():.2f}')
-                epoch_pbar.refresh()
+            epoch_pbar.update(step_tokens)
+            epoch_pbar.set_description(f'epoch {1 + seen_tokens // epoch_size}')
+            epoch_pbar.set_postfix(loss=f'{loss_meter.mean():.2f}')
+            epoch_pbar.refresh()
             if step % save_every == 0:
-                print('Saving')
                 save()
             if is_main and step % log_every == 0:
                 json_log_plots.write_event(run_path, step=seen_tokens,

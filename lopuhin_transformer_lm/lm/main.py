@@ -223,10 +223,10 @@ def main(
     def train():
         nonlocal seen_tokens
         epoch_size = len(train_dataset) // step_tokens * step_tokens
-        pbar = tqdm.trange(
-            epochs, desc='epochs', dynamic_ncols=True, disable=not is_main)
-        init_epoch_pbar = lambda: tqdm.trange(
-            epoch_size, dynamic_ncols=True, disable=not is_main)
+        pbar = tqdm(
+            range(epochs), desc='epochs', dynamic_ncols=True, disable=not is_main)
+        init_epoch_pbar = lambda: tqdm(
+            range(epoch_size), dynamic_ncols=True, disable=not is_main)
         epoch_pbar = init_epoch_pbar()
         pbar.update(seen_tokens // epoch_size)
         pbar.refresh()

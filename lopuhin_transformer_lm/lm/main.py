@@ -13,7 +13,7 @@ def isnotebook():
 if isnotebook():
   from tqdm.notebook import tqdm
 else:
-  import tqdm
+  from rqdm import tqdm
 
 
 import json
@@ -346,7 +346,7 @@ def _valid_batch_iter(
     else:
         start_indices = range(0, len(dataset) - n_ctx, n_ctx)
     return _batch_it(
-        (dataset[start_idx: start_idx + n_ctx] for start_idx in tqdm.tqdm(
+        (dataset[start_idx: start_idx + n_ctx] for start_idx in tqdm(
             start_indices, desc='validation', leave=False)),
         batch_size=batch_size)
 

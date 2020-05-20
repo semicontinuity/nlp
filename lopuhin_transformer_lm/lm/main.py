@@ -144,6 +144,7 @@ def main(
         """ Load model, update seen_tokens value
         """
         nonlocal seen_tokens
+        print(f'Loading model from {model_path}')
         state = torch.load(model_path, map_location=device)
         if 'seen_tokens' in state:
             seen_tokens = state['seen_tokens']
@@ -225,6 +226,7 @@ def main(
             seen_tokens += step_tokens
             step += 1
             if step % epoch_pbar_refresh_every == 0:
+                print(f'Step: {} // {}, updating bar', step, epoch_pbar_refresh_every)
                 epoch_pbar.update(step_tokens)
                 epoch_pbar.set_description(f'epoch {1 + seen_tokens // epoch_size}')
                 epoch_pbar.set_postfix(loss=f'{loss_meter.mean():.2f}')

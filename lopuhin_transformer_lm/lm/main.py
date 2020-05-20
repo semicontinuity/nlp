@@ -39,6 +39,7 @@ def main(
         n_hidden=None,  # equal to n_embed by default (better leave at None)
         clean=False,  # clean run folder
         log_every=20,
+        pbar_refresh_every=1,
         save_every=10000,
         validate_every=None,  # same as save_every by default
         only_validate=False,
@@ -226,7 +227,8 @@ def main(
             epoch_pbar.update(step_tokens)
             epoch_pbar.set_description(f'epoch {1 + seen_tokens // epoch_size}')
             epoch_pbar.set_postfix(loss=f'{loss_meter.mean():.2f}')
-            epoch_pbar.refresh()
+            if step % pbar_refresh_every == 0:
+                epoch_pbar.refresh()
             if step % save_every == 0:
                 save()
             if is_main and step % log_every == 0:

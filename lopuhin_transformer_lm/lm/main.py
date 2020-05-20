@@ -39,7 +39,7 @@ def main(
         n_hidden=None,  # equal to n_embed by default (better leave at None)
         clean=False,  # clean run folder
         log_every=20,
-        pbar_refresh_every=1,
+        epoch_pbar_refresh_every=1,
         save_every=10000,
         validate_every=None,  # same as save_every by default
         only_validate=False,
@@ -55,7 +55,6 @@ def main(
         device_id=None,
         n_devices=None,
         ):
-    print("pbar_refresh_every", pbar_refresh_every)
     if n_devices is None:
         n_devices = torch.cuda.device_count()
         if n_devices > 1:
@@ -215,7 +214,6 @@ def main(
         pbar.refresh()
         epoch_pbar.update(seen_tokens % epoch_size)
         step = 1
-        print("pbar_refresh_every", pbar_refresh_every)
         while seen_tokens < epochs * epoch_size:
             if max_tokens and seen_tokens >= max_tokens:
                 print(f'max_tokens {max_tokens} reached, '
@@ -226,12 +224,13 @@ def main(
             train_step()
             seen_tokens += step_tokens
             step += 1
-            epoch_pbar.update(step_tokens)
-            epoch_pbar.set_description(f'epoch {1 + seen_tokens // epoch_size}')
-            epoch_pbar.set_postfix(loss=f'{loss_meter.mean():.2f}')
-            if step % pbar_refresh_every == 0:
+            if step % epoch_pbar_refresh_every == 0:
+                epoch_pbar.update(step_tokens)
+                epoch_pbar.set_description(f'epoch {1 + seen_tokens // epoch_size}')
+                epoch_pbar.set_postfix(loss=f'{loss_meter.mean():.2f}')
                 epoch_pbar.refresh()
             if step % save_every == 0:
+                print('Saving')
                 save()
             if is_main and step % log_every == 0:
                 json_log_plots.write_event(run_path, step=seen_tokens,

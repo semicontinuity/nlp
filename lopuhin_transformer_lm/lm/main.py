@@ -11,7 +11,7 @@ def isnotebook():
         return False      # Probably standard Python interpreter
 
 if isnotebook():
-  import from tqdm.notebook import tqdm
+  from tqdm.notebook import tqdm
 else:
   import tqdm
 

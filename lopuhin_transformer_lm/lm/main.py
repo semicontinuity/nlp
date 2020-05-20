@@ -55,6 +55,7 @@ def main(
         device_id=None,
         n_devices=None,
         ):
+    print("pbar_refresh_every", pbar_refresh_every)
     if n_devices is None:
         n_devices = torch.cuda.device_count()
         if n_devices > 1:
@@ -214,6 +215,7 @@ def main(
         pbar.refresh()
         epoch_pbar.update(seen_tokens % epoch_size)
         step = 1
+        print("pbar_refresh_every", pbar_refresh_every)
         while seen_tokens < epochs * epoch_size:
             if max_tokens and seen_tokens >= max_tokens:
                 print(f'max_tokens {max_tokens} reached, '

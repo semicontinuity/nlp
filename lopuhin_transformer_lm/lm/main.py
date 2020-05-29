@@ -13,7 +13,7 @@ def isnotebook():
 if isnotebook():
   from tqdm.notebook import tqdm
 else:
-  from rqdm import tqdm
+  from tqdm import tqdm
 
 
 import json
@@ -71,6 +71,7 @@ def main(
         # These two are set automatically when multiple GPUs are available
         device_id=None,
         n_devices=None,
+        tied_blocks=False,
         ):
     if n_devices is None:
         n_devices = torch.cuda.device_count()
@@ -112,6 +113,7 @@ def main(
         n_head=n_head,
         n_layer=n_layer,
         gradient_checkpointing=gradient_checkpointing,
+        tied_blocks=tied_blocks,
     )
     params = dict(
         hparams=attr.asdict(hparams),

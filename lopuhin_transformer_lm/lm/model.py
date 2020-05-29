@@ -19,18 +19,29 @@ class HParams:
     n_head: int
     n_layer: int
     gradient_checkpointing: bool = False
+    tied_blocks: bool = False
 
 
 class Model(nn.Module):
     def __init__(self, hparams: HParams):
         super().__init__()
         self.hparams = hparams
+
+        # positional encoding
         self.wpe = nn.Embedding(hparams.n_ctx, hparams.n_embed)
         nn.init.normal_(self.wpe.weight, std=0.01)
+
+        # token encoding
         self.wte = nn.Embedding(hparams.n_vocab, hparams.n_embed)
         nn.init.normal_(self.wte.weight, std=0.02)
-        self.blocks = nn.ModuleList(
-            [Block(hparams) for _ in range(hparams.n_layer)])
+
+        if hparams.tied_blocks:
+            block = Block(hparams)
+            self.blocks = nn.ModuleList(
+                [block for _ in range(hparams.n_layer)])
+        else:
+            self.blocks = nn.ModuleList(
+                [Block(hparams) for _ in range(hparams.n_layer)])
         self.ln_f = Norm(self.hparams.n_hidden)
         if hparams.n_hidden != hparams.n_embed:
             self.in_proj = Conv1D(hparams.n_embed, hparams.n_hidden)
